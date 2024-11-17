@@ -5,13 +5,13 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.ai.mistralai.MistralAiChatModel;
+import org.springframework.ai.mistralai.MistralAiEmbeddingModel;
 import reactor.core.publisher.Flux;
 
-import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.mistralai.MistralAiChatClient;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
-import org.springframework.ai.mistralai.MistralAiEmbeddingClient;
 import org.springframework.ai.mistralai.api.MistralAiApi;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.WebApplicationType;
@@ -30,21 +30,21 @@ public class MistralAiAotDemoApplication {
     }
 
     @Bean
-    ApplicationRunner applicationRunner(MistralAiChatClient chatClient, MistralAiEmbeddingClient embeddingClient) {
+    ApplicationRunner applicationRunner(MistralAiChatModel chatClient, MistralAiEmbeddingModel embeddingClient) {
         return args -> {
 
             // Synchronous Chat Client
-            String response = chatClient.call("Tell me a joke.");
+            String response = chatClient.call("Tell me a joke about cortana.");
             System.out.println("SYNC RESPONSE: " + response);
 
             // Streaming Chat Client
-            Flux<ChatResponse> flux = chatClient.stream(new Prompt("Tell me a joke."));
+            Flux<ChatResponse> flux = chatClient.stream(new Prompt("Tell me a joke about cortana."));
             String fluxResponse = flux.collectList().block().stream().map(r -> r.getResult().getOutput().getContent())
                     .collect(Collectors.joining());
             System.out.println("ASYNC RESPONSE: " + fluxResponse);
 
             // Embedding Client
-            List<List<Double>> embeddings = embeddingClient.embed(List.of("Hello", "World"));
+            List<float[]> embeddings = embeddingClient.embed(List.of("Hello", "World"));
             System.out.println("EMBEDDINGS SIZE: " + embeddings.size());
 
             // Function calling.
