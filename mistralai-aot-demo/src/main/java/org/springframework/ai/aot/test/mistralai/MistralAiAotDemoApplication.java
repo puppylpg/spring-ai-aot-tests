@@ -33,28 +33,29 @@ public class MistralAiAotDemoApplication {
     ApplicationRunner applicationRunner(MistralAiChatModel chatClient, MistralAiEmbeddingModel embeddingClient) {
         return args -> {
 
-            // Synchronous Chat Client
-            String response = chatClient.call("Tell me a joke about cortana.");
-            System.out.println("SYNC RESPONSE: " + response);
-
-            // Streaming Chat Client
-            Flux<ChatResponse> flux = chatClient.stream(new Prompt("Tell me a joke about cortana."));
-            String fluxResponse = flux.collectList().block().stream().map(r -> r.getResult().getOutput().getContent())
-                    .collect(Collectors.joining());
-            System.out.println("ASYNC RESPONSE: " + fluxResponse);
-
-            // Embedding Client
-            List<float[]> embeddings = embeddingClient.embed(List.of("Hello", "World"));
-            System.out.println("EMBEDDINGS SIZE: " + embeddings.size());
+//            // Synchronous Chat Client
+//            String response = chatClient.call("Tell me a joke about cortana.");
+//            System.out.println("SYNC RESPONSE: " + response);
+//
+//            // Streaming Chat Client
+//            Flux<ChatResponse> flux = chatClient.stream(new Prompt("Tell me a joke about cortana."));
+//            String fluxResponse = flux.collectList().block().stream().map(r -> r.getResult().getOutput().getContent())
+//                    .collect(Collectors.joining());
+//            System.out.println("ASYNC RESPONSE: " + fluxResponse);
+//
+//            // Embedding Client
+//            List<float[]> embeddings = embeddingClient.embed(List.of("Hello", "World"));
+//            System.out.println("EMBEDDINGS SIZE: " + embeddings.size());
 
             // Function calling.
             // Function name is the bean name. Only the Mistral AI large and small models support function calling.
             ChatResponse paymentStatusResponse = chatClient
-                    .call(new Prompt("What's the status of my transaction with id T1005?",
+                    .call(new Prompt("What's the status of my transaction with id T1005 and T1001?",
                             MistralAiChatOptions.builder()
                                     .withModel(MistralAiApi.ChatModel.SMALL.getValue())
                                     .withFunction("retrievePaymentStatus").build()));
 
+            // PAYMENT STATUS: The transaction T1005 is still pending, but the transaction T1001 has been paid.
             System.out.println("PAYMENT STATUS: " + paymentStatusResponse.getResult().getOutput().getContent());
         };
     }
